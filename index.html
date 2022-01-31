@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" style="height: 100%;">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>CheerpX Simple Executable Test</title>
+  <!-- <script src="https://cxrtnc.leaningtech.com/1.0.9/cx.js"></script> -->
+  <script src="/cx/cx.js"></script>
+  <!-- <script src="serviceWorker.js"></script> -->
+</head>
+
+<body style="height: 100%; background: black;">
+  <pre id="console" style="height: 100%;"></pre>
+
+  <script type="module">
+    // Initialize CheerpX
+    const cx = await CheerpX.Linux.create();
+    cx.setConsole(document.getElementById("console"));
+    // Run the compiled executable
+    await cx.run("/hello", []);
+  </script>
+</body>
+
+</html>
