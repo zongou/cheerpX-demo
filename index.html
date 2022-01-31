@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" style="heigth: 100%;">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <title>CheerpX Demo</title>
+    <script src="https://cxrtnc.leaningtech.com/1.0.9/cx.js"></script>
+    <script src="./xterm/xterm.js"></script>
+    <script src="./xterm/xterm-addon-fit.js"></script>
+    <script src="./xterm/xterm-addon-web-links.js"></script>
+    <link rel="stylesheet" href="./xterm/xterm.css" />
+    <script src="serviceWorker.js"></script>
+
+
+    <script type="module">
+        async function loadCX() {
+            // Interact with Xterm.js
+            var term = new Terminal({ cursorBlink: true, convertEol: true, fontFamily: "monospace", fontWeight: 400, fontWeightBold: 700 });
+            term.open(document.getElementById("terminal"));
+            const linkAddon = new WebLinksAddon.WebLinksAddon();
+            term.loadAddon(linkAddon);
+            const fitAddon = new FitAddon.FitAddon();
+            term.loadAddon(fitAddon);
+
+            term.scrollToTop();
+            fitAddon.fit();
+            term.focus();
+
+            window.addEventListener("resize", () => {
+                fitAddon.fit();
+            });
+
+            term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m\n');
+
+            // The read-only disk image from Leaning Technologies' fast cloud backend
+            const blockDevice = await CheerpX.HttpBytesDevice.create(
+                "/rootfs.ext2"
+            );
+            // Read-write local storage for disk blocks, it is used both as a cache and as persisteny writable storage
+            const idbDevice = await CheerpX.IDBDevice.create("block1");
+            // A device to overlay the local changes to the disk with the remote read-only image
+            const overlayDevice = await CheerpX.OverlayDevice.create(
+                blockDevice,
+                idbDevice
+            );
+            // Direct acces to files in your HTTP server
+            const webDevice = await CheerpX.WebDevice.create("");
+            // Convenient access to JavaScript binary data and strings
+            const dataDevice = await CheerpX.DataDevice.create();
+
+            const cx = await CheerpX.Linux.create({
+                mounts: [
+                    { type: "ext2", path: "/", dev: overlayDevice },
+                    { type: "dir", path: "/app", dev: webDevice },
+                    { type: "dir", path: "/data", dev: dataDevice },
+                    { type: "devs", path: "/dev" },
+                ],
+            });
+
+            let msgCleared = false;
+
+            const send = cx.setCustomConsole(
+                (buf) => {
+                    if (!msgCleared) {
+                        term.clear();
+                        msgCleared = true;
+                    }
+                    term.write(new Uint8Array(buf));
+                },
+                term.cols,
+                term.rows
+            );
+            term.onData((str) => {
+                for (let i = 0; i < str.length; i++) {
+                    send(str.charCodeAt(i));
+                }
+            });
+
+            // Run a full-featured shell in your browser.
+            await cx.run("/bin/bash", ["--login"], {
+                env: [
+                    "HOME=/home/user",
+                    "USER=user",
+                    "SHELL=/bin/bash",
+                    "EDITOR=vim",
+                    "LANG=en_US.UTF-8",
+                    "LC_ALL=C",
+                    "TERM=xterm-256color"
+                ],
+                cwd: "/home/user",
+                uid: 1000,
+                gid: 1000,
+            });
+        }
+
+        window.onload = () => {
+            loadCX();
+        };
+
+    </script>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #terminal {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #terminal>.terminal {
+            padding: 5px;
+            height: calc(100% - 10px);
+        }
+
+        .media-layer {
+            overflow: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            z-index: 4;
+        }
+
+        .media-layer>div {
+            position: relative;
+            width: 100%;
+        }
+
+        .media-layer>div>* {
+            cursor: pointer;
+        }
+
+        .xterm .xterm-viewport {
+            width: initial !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="terminal"></div>
+</body>
+
+</html>
