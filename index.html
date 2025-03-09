@@ -37,7 +37,7 @@
 
             // The read-only disk image from Leaning Technologies' fast cloud backend
             const blockDevice = await CheerpX.HttpBytesDevice.create(
-                "/rootfs.ext2"
+                "/rootfs.ext2.txt"
             );
             // Read-write local storage for disk blocks, it is used both as a cache and as persisteny writable storage
             const idbDevice = await CheerpX.IDBDevice.create("block1");
