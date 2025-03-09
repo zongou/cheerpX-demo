@@ -192,7 +192,7 @@ jobs:
       # Move required files for gh-pages deployment to the deployment directory $DEPLOY_DIR.
       - name: Copy
         run: |
-          sudo cp -r xterm hello hello.html index.html rootfs.ext2 server.hs serviceWorker.js $DEPLOY_DIR/
+          sudo cp -r xterm hello hello.html index.html rootfs.ext2 serviceWorker.js $DEPLOY_DIR/
 
       # We generate index.list files for our httpfs to function properly.
       - name: make index.list
