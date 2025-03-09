@@ -11,13 +11,13 @@ on:
         type: string
         description: 'Path to the Dockerfile'
         required: true
-        default: 'dockerfiles/debian_mini'
+        default: 'dockerfiles/alpine_mini'
 
       IMAGE_SIZE:
         type: string
         description: 'Image size, 950M max'
         required: true
-        default: '600M'
+        default: '50M'
 
       DEPLOY_TO_GITHUB_PAGES:
         type: boolean
@@ -164,6 +164,9 @@ jobs:
           sudo umount /mnt/
       # Result is an ext2 image for webvm.
 
+      # Move required files for gh-pages deployment to the deployment directory $DEPLOY_DIR.
+      - run: sudo mv assets examples xterm favicon.ico index.html login.html network.js scrollbar.css serviceWorker.js tower.ico $DEPLOY_DIR
+      
       # The .txt suffix enabled HTTP compression for free
       - name: Generate image split chunks and .meta file
         run: |
