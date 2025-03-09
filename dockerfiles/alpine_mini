@@ -1,6 +1,6 @@
 FROM --platform=i386 i386/alpine:edge
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apk add --no-cache bash bash-completion
+RUN apk add --no-cache shadow bash bash-completion
 RUN useradd -m user && echo "user:password" | chpasswd
 # COPY --chown=user:user ./examples /home/user/examples
 RUN chmod -R +x  /home/user/examples/lua

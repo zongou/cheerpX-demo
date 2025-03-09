@@ -43,6 +43,11 @@ Login
 prootie login rootfs
 ```
 
+```sh
+prootie login rootfs -- /bin/sh -l -c "apk add --no-cache shadow bash bash-completion"
+prootie login rootfs -- /bin/sh -l -c "useradd -m user && echo \"user:password\" | chpasswd"
+```
+
 Setup
 
 ```sh
