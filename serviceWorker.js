@@ -72,7 +72,7 @@ async function doRegister() {
 			};
 		}
 	}
-	catch {
+	catch (e) {
 		console.error("Service Worker failed to register:", e)
 	}
 }
